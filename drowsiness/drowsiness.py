@@ -161,7 +161,7 @@ while True:
 
         cv2.putText(frame, f"EAR: {ear:.2f}", (300, 30),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-        cv2.putText(frame, "YAWN: {distance:.2f}", (300, 60),
+        cv2.putText(frame, f"YAWN: {distance:.2f}", (300, 60),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
     cv2.imshow("Frame", frame)
