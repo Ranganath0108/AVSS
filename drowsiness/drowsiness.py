@@ -100,7 +100,7 @@ vs = VideoStream(src=args["webcam"]).start()
 
 # vs= VideoStream(usePiCamera=True).start()       //For Raspberry Pi
 
-#wait for 1 sec
+# wait for 1 sec
 time.sleep(1.0)
 
 
@@ -110,13 +110,65 @@ while True:
     frame = imutils.resize(frame, width=450)
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    rects = detector(gray, 0) 
+    rects = detector(gray, 0)
 
     for rect in rects:
-        pass
-    
-    
+        shape = predictor(gray, rect)
+        shape = face_utils.shape_to_np(shape)
 
+        eye = final_EAR(shape)
+        ear = eye[0]
+        leftEye = eye[1]
+        rightEye = eye[2]
 
+        distance = lip_distance(shape)
 
+        leftEyeHull = cv2.convexHull(leftEye)
+        rightEyeHull = cv2.convexHull(rightEye)
+        cv2.drawContours(frame, [leftEyeHull], -1, (0, 255, 0), 1)
+        cv2.drawContours(frame, [rightEyeHull], -1, (0, 255, 0), 1)
 
+        lip = shape[48:60]
+        cv2.drawContours(frame, [lip], -1, (0, 255, 0), 1)
+
+        if ear < EYE_AR_THRESH:
+            COUNTER += 1
+
+            if COUNTER >= EYE_AR_CONSEC_FRAMES:
+                if alarm_status == False:
+                    alarm_status = True
+                    t = Thread(target=alarm, args=('wake up sir',))
+                    t.deamon = True
+                    t.start()
+
+                cv2.putText(frame, "DROWSINESS ALERT!", (10, 30),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+
+        else:
+            COUNTER = 0
+            alarm_status = False
+
+        if (distance > YAWN_THRESH):
+            cv2.putText(frame, "Yawn Alert", (10, 30),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            if alarm_status2 == False and saying == False:
+                alarm_status2 = True
+                t = Thread(target=alarm, args=('Please Take some rest',))
+                t.deamon = True
+                t.start()
+        else:
+            alarm_status2 = False
+
+        cv2.putText(frame, f"EAR: {ear:.2f}", (300, 30),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+        cv2.putText(frame, "YAWN: {distance:.2f}", (300, 60),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+
+    cv2.imshow("Frame", frame)
+    key = cv2.waitKey(1) & 0xFF
+
+    if key == ord("q"):
+        break
+
+cv2.destroyAllWindows()
+vs.stop()
