@@ -13,6 +13,15 @@ import cv2
 import os
 
 
+EYE_AR_THRESH = 0.3
+EYE_AR_CONSEC_FRAMES = 30
+YAWN_THRESH = 20
+alarm_status = False
+alarm_status2 = False
+saying = False
+COUNTER = 0
+
+
 # To find Eye Aspect ratio
 
 
@@ -59,3 +68,55 @@ def lip_distance(shape):
 
     distance = abs(top_mean[1] - low_mean[1])
     return distance
+
+
+def alarm(msg):
+    global alarm_status
+    global alarm_status2
+    global saying
+
+    while alarm_status:
+        s = 'espeak "'+msg+'"'
+        os.system(s)
+
+    if alarm_status2:
+        print('call')
+        saying = True
+        s = 'espeak "' + msg + '"'
+        os.system(s)
+        saying = False
+
+
+ap = argparse.ArgumentParser()
+ap.add_argument("-w", "--webcam", type=int, default=0,
+                help="index of webcam on system")
+args = vars(ap.parse_args())
+
+# get front face
+detector = dlib.get_frontal_face_detector()
+predictor = dlib.shape_predictor(
+    "\AVSS\drowsiness\shape_predictor_68_face_landmarks.dat")
+vs = VideoStream(src=args["webcam"]).start()
+
+# vs= VideoStream(usePiCamera=True).start()       //For Raspberry Pi
+
+#wait for 1 sec
+time.sleep(1.0)
+
+
+while True:
+
+    frame = vs.read()
+    frame = imutils.resize(frame, width=450)
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    rects = detector(gray, 0) 
+
+    for rect in rects:
+        pass
+    
+    
+
+
+
+
