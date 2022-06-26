@@ -94,8 +94,7 @@ args = vars(ap.parse_args())
 
 # get front face
 detector = dlib.get_frontal_face_detector()
-predictor = dlib.shape_predictor(
-    "\AVSS\drowsiness\shape_predictor_68_face_landmarks.dat")
+predictor = dlib.shape_predictor("drowsiness/shape_predictor_68_face_landmarks.dat")
 vs = VideoStream(src=args["webcam"]).start()
 
 # vs= VideoStream(usePiCamera=True).start()       //For Raspberry Pi
@@ -143,6 +142,7 @@ while True:
 
                 cv2.putText(frame, "DROWSINESS ALERT!", (10, 30),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                
 
         else:
             COUNTER = 0
