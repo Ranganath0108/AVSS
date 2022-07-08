@@ -4,6 +4,7 @@ from scipy.spatial import distance as dist
 from imutils.video import VideoStream
 from imutils import face_utils
 from threading import Thread
+from playsound import playsound
 import numpy as np
 import argparse
 import imutils
@@ -139,6 +140,8 @@ while True:
                     t = Thread(target=alarm, args=('wake up sir',))
                     t.deamon = True
                     t.start()
+                
+                playsound("drowsiness\mixkit-vintage-warning-alarm-990.wav")
 
                 cv2.putText(frame, "DROWSINESS ALERT!", (10, 30),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
